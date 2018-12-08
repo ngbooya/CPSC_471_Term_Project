@@ -6,15 +6,18 @@
 # *****************************************************
 
 import socket
+import sys
 
 # The port on which to listen
-listenPort = 1234
+# listenPort = 1234
+
+listenPort = sys.argv[1]
 
 # Create a welcome socket.
 welcomeSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind the socket to the port
-welcomeSock.bind(('', listenPort))
+welcomeSock.bind(('', int(listenPort)))
 
 # Start listening on the socket
 welcomeSock.listen(1)
