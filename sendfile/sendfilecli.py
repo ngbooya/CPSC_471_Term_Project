@@ -28,15 +28,17 @@ fileName = "file.txt"
 # Open the file
 # fileObj = open(fileName, "r")
 
-# Create a TCP socket
-connSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Connect to the server
-connSock.connect((serverAddr, int(serverPort)))
 
 
 # Keep sending until all is sent
 def sendfile(send_file):
+	# Create a TCP socket
+	connSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+	# Connect to the server
+	connSock.connect((serverAddr, int(serverPort)))
+
 	# Open the file
 	fileObj = open(send_file, "r")
 	# The number of bytes sent
@@ -76,9 +78,35 @@ def sendfile(send_file):
 		# The file has been read. We are done
 		else:
 			break
+
 	print("Send", numSent, " bytes")
 
+	connSock.send(send_file.encode('utf-8'))
+	data = connSock.recv(1024)
+	print (data.decode('utf-8'))
 
+	connSock.close()
+	fileObj.close()
+
+
+def recvFile(filename):
+	# Create a TCP socket
+	connSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+	# Connect to the server
+	connSock.connect((serverAddr, int(serverPort)))
+	
+	connSock.send(filename.encode('utf-8'))
+
+	downloadDir = "./"
+	with open(os.path.join(downloadDir.encode('utf-8'), filename.encode('utf-8')), 'wb') as file_to_write:
+		while True:
+			data = connSock.recv(1024)
+			if not data:
+			    break
+			file_to_write.write(data.decode('utf-8'))
+	file_to_write.close()
+	connSock.close()
 
 
 userInput = None
@@ -95,6 +123,7 @@ while userInput != "quit":
 
 	if command == "get":
 		print("GET COMMAND")
+		recvFile(file)
 	elif command == "put":
 		print("PUT COMMAND")
 		sendfile(file)

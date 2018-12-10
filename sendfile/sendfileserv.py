@@ -90,14 +90,27 @@ while True:
 
 	# print "The file size is ", fileSize
 	print("The file size is", fileSize)
+	print(fileSizeBuff)
 
 	# Get the file data
 	fileData = recvAll(clientSock, fileSize)
-
+	
 	# print "The file data is: "
 	# print fileData
 	print("The file data is: ")
 	print(fileData)
+
+	# if (fileData)
+	# {
+	reqFile = clientSock.recv(1024)
+	print("requesting: ", reqFile.decode('utf-8'))
+	# with open(reqFile.decode('utf-8'), 'rb') as file_to_send:
+	# for data in file_to_send:
+	clientSock.sendall(fileData.encode('utf-8'))
+	# fileData_tmp = fileData
+	# }
+	
+	# sock.close()
 
 	# Close our side
 	clientSock.close()
