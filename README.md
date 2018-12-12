@@ -5,7 +5,7 @@ John Lee
 
 
 ## How to run:
-As our project was writting using python3, please make sure that the correct version of python is running 
+As our project was written using python3, please make sure that the correct version of python is running 
 on your machine before executing our code. 
 Open two command line/terminal tabs, and simply enter 
 
