@@ -115,7 +115,11 @@ def recvFile(filename):
 	print(list_of_files[filename])
 
 
-
+def listFiles():
+	if len(list_of_files) == 0:
+		return;
+	for key,val in list_of_files.items():
+		print(key,"\t");
 
 userInput = None
 
@@ -136,8 +140,10 @@ while userInput != "quit":
 		print("PUT COMMAND")
 		sendfile(file)
 	elif command == "ls":
+		listFiles()
 		print("LS COMMAND")
 	elif command == "quit":
+
 		print("QUIT COMMAND")
 
 
@@ -147,5 +153,5 @@ while userInput != "quit":
 # print("Send", numSent, " bytes")
 
 # Close the socket and the file
-connSock.close()
-fileObj.close()
+# connSock.close()
+# fileObj.close()
