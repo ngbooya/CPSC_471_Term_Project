@@ -22,6 +22,8 @@ welcomeSock.bind(('', int(listenPort)))
 # Start listening on the socket
 welcomeSock.listen(1)
 
+list_of_files = {}
+
 # ************************************************
 # Receives the specified number of bytes
 # from the specified socket
@@ -58,67 +60,106 @@ def recvAll(sock, numBytes):
 while True:
 
 	# print "Waiting for connections..."
-	print("Waiting for connections...")
+	print("Waiting for Command...")
+	commandSock, commandAddr = welcomeSock.accept();
+	print("Accepted command connection from client: ", commandAddr)
+	command,param = recvAll(commandSock,1024).split(" ")
+	print(command,"Param(",param,")")
+	# result = "SUCCESS!";
+	# commandSock.send(result.encode('utf-8'))
+	commandSock.close()
 
-	# Accept connections
-	clientSock, addr = welcomeSock.accept()
+	if command == "ls":
+		clientSock, addr = welcomeSock.accept()
 
-	# print "Accepted connection from client: ", addr
-	# print "\n"
+		print("Returning File Listing...")
+		if len(list_of_files) == 0:
+			clientSock.sendall(("ERROR: No Files!").encode('utf-8'))
+		else:
+			files = ""
+			for key,val in list_of_files.items():
+				files += key + "\t";
+			clientSock.sendall(files.encode('utf-8'))
+	elif command == "get":
+		print("Returning File Data")
+		clientSock, addr = welcomeSock.accept()
+		reqFile = clientSock.recv(1024)
+		fileName = reqFile.decode('utf-8')
+		print("requesting: ", fileName)
 
-	print("Accepted connection from client: ", addr)
-	print("\n")
+		# with open(reqFile.decode('utf-8'), 'rb') as file_to_send:
+		# for data in file_to_send:
+		if fileName in list_of_files:
+			clientSock.sendall(list_of_files[fileName].encode('utf-8'))
+		else:
+			clientSock.sendall(("ERROR: " + fileName +" not found!").encode('utf-8'))
 
-	# The buffer to all data received from the
-	# the client.
-	fileData = ""
+		# Close our side
+		clientSock.close()
+	elif command == "put":
 
-	# The temporary buffer to store the received
-	# data.
-	recvBuff = ""
+		print("Waiting for file.")
+		# Accept connections
+		clientSock, addr = welcomeSock.accept()
 
-	# The size of the incoming file
-	fileSize = 0
+		# print "Accepted connection from client: ", addr
+		# print "\n"
 
-	# The buffer containing the file size
-	fileSizeBuff = ""
+		print("Accepted data connection from client: ", addr)
+		print("\n")
 
-	# Receive the first 10 bytes indicating the
-	# size of the file
-	fileSizeBuff = recvAll(clientSock, 10)
+		# The buffer to all data received from the
+		# the client.
+		fileData = ""
 
-	# Get the file size
-	fileSize = int(fileSizeBuff)
+		# The temporary buffer to store the received
+		# data.
+		recvBuff = ""
 
-	# print "The file size is ", fileSize
-	print("The file size is", fileSize)
-	print(fileSizeBuff)
+		# The size of the incoming file
+		fileSize = 0
 
-	# Get the file data
-	fileData = recvAll(clientSock, fileSize)
+		# The buffer containing the file size
+		fileSizeBuff = ""
 
-	# print "The file data is: "
-	# print fileData
-	print("The file data is: ")
-	print(fileData)
+		# Receive the first 10 bytes indicating the
+		# size of the file
+		fileSizeBuff = recvAll(clientSock, 10)
 
-	# if (fileData)
-	# {
-	reqFile = clientSock.recv(1024)
-	fileName = reqFile.decode('utf-8')
-	print("requesting: ", fileName)
+		# Get the file size
+		fileSize = int(fileSizeBuff)
 
-	list_of_file[fileName] = fileData
+		# print "The file size is ", fileSize
+		print("The file size is", fileSize)
+		print(fileSizeBuff)
 
-	print("This is from the dict")
-	print(list_of_file["file.txt"])
-	# with open(reqFile.decode('utf-8'), 'rb') as file_to_send:
-	# for data in file_to_send:
-	clientSock.sendall(fileData.encode('utf-8'))
-	# fileData_tmp = fileData
-	# }
+		# Get the file data
+		fileData = recvAll(clientSock, fileSize)
 
-	# sock.close()
+		# print "The file data is: "
+		# print fileData
+		print("The file data is: ")
+		print(fileData)
 
-	# Close our side
-	clientSock.close()
+		list_of_files[param] = fileData
+
+		print("Saved to Dictionary: ",param)
+		print(list_of_files[param])
+		# if (fileData)
+		# {
+		
+		# fileData_tmp = fileData
+		# }
+
+		# sock.close()
+
+		# Close our side
+		clientSock.close()
+
+	elif command == "quit":
+		print("Goodbye!")
+		break
+		
+	
+
+

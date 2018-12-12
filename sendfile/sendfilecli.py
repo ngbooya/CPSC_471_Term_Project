@@ -33,6 +33,10 @@ serverPort = sys.argv[2]
 
 list_of_files = {}
 
+
+
+
+
 # Keep sending until all is sent
 def sendfile(send_file):
 	# Create a TCP socket
@@ -82,13 +86,6 @@ def sendfile(send_file):
 			break
 
 	print("Send", numSent, " bytes")
-
-	connSock.send(send_file.encode('utf-8'))
-	data = connSock.recv(1024)
-
-	print (data.decode('utf-8'))
-	list_of_files[send_file] = data.decode('utf-8')
-
 	connSock.close()
 	fileObj.close()
 
@@ -111,21 +108,39 @@ def recvFile(filename):
 	# 		file_to_write.write(data.decode('utf-8'))
 	# file_to_write.close()
 	# connSock.close
-	print("This is from the get command")
-	print(list_of_files[filename])
+	# Create a TCP socket
+	connSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+	# Connect to the server
+	connSock.connect((serverAddr, int(serverPort)))
+
+	connSock.send(filename.encode('utf-8'))
+	data = connSock.recv(1024)
+	print (data.decode('utf-8'))
+	list_of_files[filename] = data.decode('utf-8')
+	
+	connSock.close()
 
 def listFiles():
-	if len(list_of_files) == 0:
-		return;
-	for key,val in list_of_files.items():
-		print(key,"\t");
+	# Create a TCP socket
+	connSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+	# Connect to the server
+	connSock.connect((serverAddr, int(serverPort)))
+
+	files = connSock.recv(1024).decode('utf-8')
+	print(files)
+	# if len(list_of_files) == 0:
+	# 	return;
+	# for key,val in list_of_files.items():
+	# 	print(key,"\t");
 
 userInput = None
 
+
 while userInput != "quit":
 	userInput = input("ftp> ")
-
+	file = ""
 	if userInput != "ls" and userInput != "quit":
 		command,file = userInput.split(" ")
 	if userInput == "ls":
@@ -133,6 +148,14 @@ while userInput != "quit":
 	if userInput == "quit":
 		command = "quit"
 
+	commandSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	commandSock.connect((serverAddr, int(serverPort)))
+	
+
+	commandSock.send((command + " " + file).encode('utf-8'));
+	commandSock.close();
+	# result = commandSock.recv(1024).decode('utf-8')
+	# print(result);
 	if command == "get":
 		print("GET COMMAND")
 		recvFile(file)
@@ -143,8 +166,8 @@ while userInput != "quit":
 		listFiles()
 		print("LS COMMAND")
 	elif command == "quit":
-
 		print("QUIT COMMAND")
+		print("Goodbye!")
 
 
 
