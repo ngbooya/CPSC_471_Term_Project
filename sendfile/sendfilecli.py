@@ -9,6 +9,8 @@ import socket
 import os
 import sys
 
+# from sendfileserv import list_of_file
+
 # Command line checks
 if len(sys.argv) < 2:
 
@@ -23,13 +25,13 @@ serverAddr = sys.argv[1]
 serverPort = sys.argv[2]
 # The name of the file
 # fileName = sys.argv[1]
-fileName = "file.txt"
+# fileName = "file.txt"
 
 # Open the file
 # fileObj = open(fileName, "r")
 
 
-
+list_of_files = {}
 
 # Keep sending until all is sent
 def sendfile(send_file):
@@ -83,34 +85,40 @@ def sendfile(send_file):
 
 	connSock.send(send_file.encode('utf-8'))
 	data = connSock.recv(1024)
+
 	print (data.decode('utf-8'))
+	list_of_files[send_file] = data.decode('utf-8')
 
 	connSock.close()
 	fileObj.close()
 
 
 def recvFile(filename):
-	# Create a TCP socket
-	connSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	# # Create a TCP socket
+	# connSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	#
+	# # Connect to the server
+	# connSock.connect((serverAddr, int(serverPort)))
+	#
+	# connSock.send(filename.encode('utf-8'))
+	#
+	# downloadDir = "./"
+	# with open(os.path.join(downloadDir.encode('utf-8'), filename.encode('utf-8')), 'wb') as file_to_write:
+	# 	while True:
+	# 		data = connSock.recv(1024)
+	# 		if not data:
+	# 		    break
+	# 		file_to_write.write(data.decode('utf-8'))
+	# file_to_write.close()
+	# connSock.close
+	print("This is from the get command")
+	print(list_of_files[filename])
 
-	# Connect to the server
-	connSock.connect((serverAddr, int(serverPort)))
-	
-	connSock.send(filename.encode('utf-8'))
 
-	downloadDir = "./"
-	with open(os.path.join(downloadDir.encode('utf-8'), filename.encode('utf-8')), 'wb') as file_to_write:
-		while True:
-			data = connSock.recv(1024)
-			if not data:
-			    break
-			file_to_write.write(data.decode('utf-8'))
-	file_to_write.close()
-	connSock.close()
 
 
 userInput = None
-#
+
 while userInput != "quit":
 	userInput = input("ftp> ")
 
