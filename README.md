@@ -1,7 +1,7 @@
 # CPSC_471_Term_Project
 
 Team Members:
-John Lee, Kevin Nguyen, Angel Soto, 
+John Lee, Kevin Nguyen, Angel Soto, and Qi Gao
 
 
 ## How to run:
